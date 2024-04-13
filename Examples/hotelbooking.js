@@ -9,7 +9,7 @@ const prompt = require('prompt-sync')();
 let hotel = {
     name: "Vaishnavi Resort",
     address: "Pune, Maharashtra, India",
-    guestAcc: 6,
+    guestAcc: 4,
     bookings: [
         {//15-17
             id: 1,
@@ -41,27 +41,48 @@ function main() {
     let compEndDate = formatToComparableDate(custEndDate)
 
     // "custStartDate>=bookingStartDate && custEndDate<=bookingEndDate"
-
     let bookings = hotel.bookings;
-    for (let i = 0; i < bookings.length; i++) {
-        console.log("------------------------------");
-        console.log(`Booking id=${bookings[i].id}`);
-        console.log("Start Dates in between");
-        //if booking startdate is equal or inbetween
-        if (compStartDate.isSameOrAfter(dayjs(bookings[i].startDate)) &&
-            compStartDate.isSameOrBefore(dayjs(bookings[i].endDate))
-        ) {
-            console.log(bookings[i]);
-        }
-        console.log("End Dates in between");
-        //if booking endate is equal ir inbetween
-        if (compEndDate.isSameOrBefore(dayjs(bookings[i].endDate)) &&
-            compEndDate.isSameOrAfter(dayjs(bookings[i].startDate))) {
-            console.log(bookings[i]);
-        }
 
+
+    let allDates = []
+    let diff = compEndDate.diff(compStartDate, "days")
+    for (let i = 0; i <= diff; i++) {
+        allDates.push(compStartDate.add(i, "day").format("YYYY-MM-DD"))
     }
+    console.log("Booking Dates", allDates);
+    let isAvaialble = true;
+    let status=allDates.every((date) => {
+        console.log(`Conflicting bookings:${date}`);
+        let compDate = dayjs(date)
+        let conflictBookings = bookings.filter((booking) => {
+            if (compDate.isSameOrAfter(dayjs(booking.startDate)) &&
+                compDate.isSameOrBefore(dayjs(booking.endDate))
+            ) {
+                return booking
+            }
+            if (compDate.isSameOrBefore(dayjs(booking.endDate)) &&
+                compDate.isSameOrAfter(dayjs(booking.startDate))) {
+                return booking
+            }
+        })
+        console.log(conflictBookings);
 
+        let totalResiding = conflictBookings.length * 2
+        console.log(`Residing on date:${totalResiding}`);
+        if (totalResiding >= hotel.guestAcc) {
+            console.log("Break");
+            isAvaialble = false
+        }
+        return isAvaialble
+    })
+    console.log(status);
+    console.log("-------------Status------------");
+    if (isAvaialble) {
+        console.log("Booking is Avaialble");
+    }
+    else {
+        console.log("Booking is not Available");
+    }
 }
 main()
 
@@ -94,3 +115,28 @@ main()
 // const d1 = dayjs("1994-04-04")
 // const d2 = dayjs(new Date())
 // console.log(d2.diff(d1,"minutes"))
+
+//Find bookings that are conflicting
+// let bookingsConflicting = []
+// for (let i = 0; i < bookings.length; i++) {
+//     console.log("------------------------------");
+//     console.log(`Booking id=${bookings[i].id}`);
+//     console.log("Start Dates in between");
+//     //if booking startdate is equal or inbetween
+//     if (compStartDate.isSameOrAfter(dayjs(bookings[i].startDate)) &&
+//         compStartDate.isSameOrBefore(dayjs(bookings[i].endDate))
+//     ) {
+//         console.log(bookings[i]);
+//         bookingsConflicting.push(bookings[i])
+//         continue
+//     }
+//     console.log("End Dates in between");
+//     //if booking endate is equal ir inbetween
+//     if (compEndDate.isSameOrBefore(dayjs(bookings[i].endDate)) &&
+//         compEndDate.isSameOrAfter(dayjs(bookings[i].startDate))) {
+//         console.log(bookings[i]);
+//         bookingsConflicting.push(bookings[i])
+//     }
+
+// }
+// console.log("Conflicting bookings:", bookingsConflicting);
