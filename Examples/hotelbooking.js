@@ -9,17 +9,22 @@ const prompt = require('prompt-sync')();
 let hotel = {
     name: "Vaishnavi Resort",
     address: "Pune, Maharashtra, India",
-    guestAcc: 4,
+    guestAcc: 6,
     bookings: [
         {//15-17
             id: 1,
-            startDate: "2024-04-15",
-            endDate: "2024-04-17",
+            startDate: "2024-04-10",
+            endDate: "2024-04-15",
         },
         {
             id: 2,
-            startDate: "2024-04-14",
-            endDate: "2024-04-15",
+            startDate: "2024-04-08",
+            endDate: "2024-04-13",
+        },
+        {
+            id: 3,
+            startDate: "2024-04-13",
+            endDate: "2024-04-16",
         }
     ]
 }
@@ -35,54 +40,52 @@ function formatToComparableDate(date) {
 
 function main() {
     let custStartDate, custEndDate;
-    custStartDate = "2024-04-15" //prompt("Enter start date[YYYY-MM-DD]= ")
-    custEndDate = "2024-04-17"//prompt("Enter end date[YYYY-MM-DD]= ")
+    custStartDate = prompt("Enter start date[YYYY-MM-DD]= ")
+    custEndDate = prompt("Enter end date[YYYY-MM-DD]= ")
     let compStartDate = formatToComparableDate(custStartDate)
     let compEndDate = formatToComparableDate(custEndDate)
 
     // "custStartDate>=bookingStartDate && custEndDate<=bookingEndDate"
     let bookings = hotel.bookings;
-
-
-    let allDates = []
-    let diff = compEndDate.diff(compStartDate, "days")
-    for (let i = 0; i <= diff; i++) {
-        allDates.push(compStartDate.add(i, "day").format("YYYY-MM-DD"))
+    let newReqDates = []
+    let durationInDays = compEndDate.diff(compStartDate, "days")
+    console.log(durationInDays);
+    for (let i = 0; i < durationInDays; i++) {
+        newReqDates.push(compStartDate.add(i, "days").format("YYYY-MM-DD"))
     }
-    console.log("Booking Dates", allDates);
+    console.log(newReqDates);
     let isAvaialble = true;
-    let status=allDates.every((date) => {
-        console.log(`Conflicting bookings:${date}`);
+    newReqDates.every((date) => {
+
         let compDate = dayjs(date)
         let conflictBookings = bookings.filter((booking) => {
+            //if booking startdate is equal or inbetween
             if (compDate.isSameOrAfter(dayjs(booking.startDate)) &&
                 compDate.isSameOrBefore(dayjs(booking.endDate))
             ) {
                 return booking
             }
-            if (compDate.isSameOrBefore(dayjs(booking.endDate)) &&
-                compDate.isSameOrAfter(dayjs(booking.startDate))) {
+            //if booking endate is equal ir inbetween
+            if (compDate.isSameOrBefore(dayjs(bookings.endDate)) &&
+                compDate.isSameOrAfter(dayjs(bookings.startDate))) {
                 return booking
             }
         })
-        console.log(conflictBookings);
 
-        let totalResiding = conflictBookings.length * 2
-        console.log(`Residing on date:${totalResiding}`);
-        if (totalResiding >= hotel.guestAcc) {
-            console.log("Break");
-            isAvaialble = false
+        console.log(`Date: ${compDate.format("YYYY-MM-DD")}`);
+        console.log(`No of People Residing:${conflictBookings.length * 2}`);
+        let totalResidingForDate = conflictBookings.length * 2
+        if (totalResidingForDate == hotel.guestAcc) {
+            isAvaialble = false;
         }
         return isAvaialble
     })
-    console.log(status);
-    console.log("-------------Status------------");
     if (isAvaialble) {
-        console.log("Booking is Avaialble");
+        console.log("Hotel is Available for your Dates");
+    } else {
+        console.log("Hotel is Not Available for your Dates");
     }
-    else {
-        console.log("Booking is not Available");
-    }
+
 }
 main()
 
