@@ -2,6 +2,8 @@ const dayjs = require("dayjs");
 var isBetween = require('dayjs/plugin/isBetween')
 var isSameOrAfter = require('dayjs/plugin/isSameOrAfter')
 dayjs.extend(isSameOrAfter)
+var isSameOrBefore = require('dayjs/plugin/isSameOrBefore')
+dayjs.extend(isSameOrBefore)
 const prompt = require('prompt-sync')();
 
 let hotel = {
@@ -9,15 +11,15 @@ let hotel = {
     address: "Pune, Maharashtra, India",
     guestAcc: 6,
     bookings: [
-        {
+        {//15-17
             id: 1,
-            startDate: "2024-04-17",
-            endDate: "2024-04-20",
+            startDate: "2024-04-15",
+            endDate: "2024-04-17",
         },
         {
             id: 2,
             startDate: "2024-04-14",
-            endDate: "2024-04-17",
+            endDate: "2024-04-15",
         }
     ]
 }
@@ -33,8 +35,8 @@ function formatToComparableDate(date) {
 
 function main() {
     let custStartDate, custEndDate;
-    custStartDate = "2024-04-13" //prompt("Enter start date[YYYY-MM-DD]= ")
-    custEndDate = "2024-04-16"//prompt("Enter end date[YYYY-MM-DD]= ")
+    custStartDate = "2024-04-15" //prompt("Enter start date[YYYY-MM-DD]= ")
+    custEndDate = "2024-04-17"//prompt("Enter end date[YYYY-MM-DD]= ")
     let compStartDate = formatToComparableDate(custStartDate)
     let compEndDate = formatToComparableDate(custEndDate)
 
@@ -44,29 +46,19 @@ function main() {
     for (let i = 0; i < bookings.length; i++) {
         console.log("------------------------------");
         console.log(`Booking id=${bookings[i].id}`);
-        console.log("Both dates in between");
-        //if bookings are equal or inbetween of start and end date of customer 
-        if ((dayjs(bookings[i].startDate).isSame(compStartDate)
-            || dayjs(bookings[i].startDate).isAfter(compStartDate))
-            &&
-            (dayjs(bookings[i].endDate).isSame(compEndDate)
-                || dayjs(bookings[i].endDate).isBefore(compEndDate))
+        console.log("Start Dates in between");
+        //if booking startdate is equal or inbetween
+        if (compStartDate.isSameOrAfter(dayjs(bookings[i].startDate)) &&
+            compStartDate.isSameOrBefore(dayjs(bookings[i].endDate))
         ) {
             console.log(bookings[i]);
         }
-        console.log("Start Dates in between");
-        //if booking startdate is equal or inbetween
-        if ((dayjs(bookings[i].startDate).isSameOrAfter(compStartDate)))
-        // && dayjs(bookings[i].startDate).isAfter(compStartDate))) 
-        {
+        console.log("End Dates in between");
+        //if booking endate is equal ir inbetween
+        if (compEndDate.isSameOrBefore(dayjs(bookings[i].endDate)) &&
+            compEndDate.isSameOrAfter(dayjs(bookings[i].startDate))) {
             console.log(bookings[i]);
         }
-        // console.log("End Dates in between");
-        // //if booking endate is equal ir inbetween
-        // if ((dayjs(bookings[i].endDate).isSame(compEndDate)
-        //    && dayjs(bookings[i].endDate).isBefore(compEndDate))) {
-        //     console.log(bookings[i]);
-        // }
 
     }
 
