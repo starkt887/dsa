@@ -8,9 +8,19 @@ class User {
         this.id = ++id
         this.name = name
         this.next = null
+        this.previous = null
     }
     setNext(nextNode) {
         this.next = nextNode
+    }
+    setPrevious(previousNode) {
+        this.previous = previousNode
+    }
+    getNext() {
+        return this.next
+    }
+    getPrevious() {
+        return this.previous
     }
 }
 function lengthList() {
@@ -34,15 +44,16 @@ function addNode() {
         tail = newNode;
         return;
     }
+    newNode.setPrevious(tail);//set previous as current tail
     tail.setNext(newNode);//set next to new node
-    tail = newNode;//update the tail to current node
+    tail = newNode;//update the tail to new node
     console.log(head, tail);
 }
 function searchNode(targetPos) {
     let listItem = head
     let pos = 1
     while (listItem != null) {
-        if (pos === (targetPos - 1)) {//search for the previous position
+        if (pos === targetPos) {//search for the previous position
             return listItem
         }
         listItem = listItem.next
@@ -51,18 +62,22 @@ function searchNode(targetPos) {
     return -1
 }
 function addNodeToPos() {
-    let position = prompt("Enter the position= ")
-    if (position == 1) {
+    let position = parseInt(prompt("Enter the position= "))
+    if (position === 1) {
         console.log("Setting Head");
         let newNode = createNode()
-        newNode.setNext(head);//set current head as next to newNode
+        newNode.setNext(head);//set newnode next as current head
+        head.setPrevious(newNode);//set previous of current head to newnode
         head = newNode;//update head to newNode
     } else {
-        let prevNode = searchNode(position)
-        if (prevNode !== -1 && prevNode.next !== null) {
+        let targetNode = searchNode(position)
+        if (targetNode !== -1) {
             let newNode = createNode()
-            newNode.setNext(prevNode.next);//set new node next to previous nodes next
-            prevNode.setNext(newNode);//set previous next to new node
+            let preTargetNode = targetNode.getPrevious();
+            preTargetNode.setNext(newNode)//update the next node to newnode of the previousnode of targetnode
+            targetNode.setPrevious(newNode)//update the previousnode of target node to new node
+            newNode.setPrevious(preTargetNode)
+            newNode.setNext(targetNode)
         }
         else {
             console.log("Position doesnt exists!");
@@ -70,17 +85,22 @@ function addNodeToPos() {
     }
 }
 function deleteNodeAtPos() {
-    let position = prompt("Enter the position= ")
-    if (position == 1) {
+    let position = parseInt(prompt("Enter the position= "))
+    if (position === 1) {
         console.log("Deleting Head");
-        head = head.next//set next element 
+        head = head.getNext()//set next element 
+        head.setPrevious(null)
     } else {
-        let prevNode = searchNode(position)
-        if (prevNode !== -1 && prevNode.next !== null) {
-            let targetNode = prevNode.next;//get the targetNode
-            prevNode.setNext(targetNode.next);//set the next of targetNode to the next of its prevNode
-            if (prevNode.next == null) {//if last node is deleted
-                tail = prevNode
+        let targetNode = searchNode(position)
+        if (targetNode !== -1) {
+            let targetNextNode = targetNode.getNext()
+            let targetPreviousNode = targetNode.getPrevious()
+            targetPreviousNode.setNext(targetNextNode)//update previous-next to target-next
+            if (targetNextNode == null) {
+                tail = targetPreviousNode
+            }
+            else {
+                targetNextNode.setPrevious(targetPreviousNode)//update next-previous to target-previous
             }
         }
         else {
@@ -98,7 +118,7 @@ function searchNodeByName() {
             return;
         }
         pos++;
-        listItem = listItem.next
+        listItem = listItem.getNext()
     }
     console.log(`${name} not found in list`)
 }
@@ -108,8 +128,10 @@ function traverseList() {
     console.log(`Head= ${head.name}`);
     let pos = 1;
     while (listItem != null) {
-        console.log(`listItem= ${pos++}`, listItem.name);
-        listItem = listItem.next
+        let previous = listItem.getPrevious() ? listItem.getPrevious().name : "NOS"
+        let next = listItem.getNext() ? listItem.getNext().name : "NOE"
+        console.log(`listItem= ${pos++}`, previous, listItem.name, next);
+        listItem = listItem.getNext()
     }
     console.log(`Tail= ${tail.name}`);
     console.log("******Linked List End********");
