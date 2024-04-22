@@ -75,7 +75,7 @@ function transposeArray(arr) {
 
     let arr2 = Array(rows)
     for (let i = 0; i < rows; i++) {
-           arr2[i]=Array(rows).fill(0)
+           arr2[i]=Array(cols).fill(0)
     }
     console.log(arr2);
     for (let i = 0; i < rows; i++) {
