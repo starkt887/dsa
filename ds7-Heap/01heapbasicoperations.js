@@ -74,8 +74,27 @@ class Heap {
         }
         console.log(`Deleted ${root}`);
     }
+
     showHeap() {
         console.log(this.arr);
+        let i = 0;
+        console.log(this.arr[i]);
+        let lchild = this.lChild(i)
+        let rchild = this.rChild(i)
+        while (i < this.heapSize && (lchild < this.heapSize || rchild < this.heapSize)) {
+            let lChildVal = 0, rChildVal = 0
+            if (lchild < this.heapSize) {
+                lChildVal = this.arr[lchild]
+            }
+            if (rchild < this.heapSize) {
+                rChildVal = this.arr[rchild]
+            }
+
+            console.log(`${lChildVal}---${rChildVal}`);
+            i++
+            lchild = this.lChild(i)
+            rchild = this.rChild(i)
+        }
     }
 }
 
